@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Кабінет лікаря{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Ваші записи на прийом</h2>
+
+{% if appointments %}
+<div class="list-group">
+  {% for app in appointments %}
+  <div class="list-group-item shadow-sm rounded p-3 mb-3 {{ 'bg-light text-muted' if app.status == 'past' else 'bg-white' }}">
+    <div><i class="fas fa-user-md icon"></i> <strong>Пацієнт:</strong> {{ app.patient_username or '—' }}</div>
+    <div><i class="fas fa-calendar-alt icon"></i> <strong>Дата:</strong> {{ app.date }}</div>
+    <div><i class="fas fa-clock icon"></i> <strong>Час:</strong> {{ app.time }}</div>
+    <div><i class="fas fa-thumbtack icon"></i> <strong>Статус:</strong>
+      {% if app.status == 'past' %}
+        <span class="badge bg-secondary">Відбувся</span>
+      {% else %}
+        <span class="badge bg-success">Очікується</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="alert alert-warning">Записів поки немає.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,165 @@
+/* --- Змінні для легкої кастомізації --- */
+:root {
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --bg-main: #f8fafc;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --card-bg: #ffffff;
+    --accent-blue: #0077cc;
+    --border-color: #e2e8f0;
+    --success: #22c55e;
+    --danger: #ef4444;
+}
+
+/* --- Загальні налаштування --- */
+body {
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- Навігація (Navbar) --- */
+.navbar {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px); /* Ефект матового скла */
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-weight: 800 !important;
+    color: var(--accent-blue) !important;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* --- Заголовки --- */
+h1, h2, h3 {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Картки (Лікарі, Записи) --- */
+.card, .doctor-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card:hover, .doctor-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Фото лікаря */
+.doctor-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 15px;
+}
+
+/* --- Форми та Поля вводу --- */
+.form-control, .form-select, input {
+    border: 2px solid #f1f5f9 !important;
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    background: #f8fafc !important;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    background: #fff !important;
+    outline: none;
+}
+
+/* --- Кнопки --- */
+.btn-primary {
+    background: var(--primary-gradient) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 28px !important;
+    font-weight: 600 !important;
+    color: white !important;
+    transition: opacity 0.2s ease, transform 0.1s active;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.btn-outline-primary {
+    border: 2px solid #6366f1 !important;
+    color: #6366f1 !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+/* --- Таблиці (для записів) --- */
+.table {
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    background: #f1f5f9;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    padding: 16px;
+    border: none;
+}
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* --- Статуси (Badges) --- */
+.badge {
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+}
+
+.status-active { background: #dcfce7; color: #166534; }
+.status-pending { background: #fef9c3; color: #854d0e; }
+
+/* --- Повідомлення --- */
+.alert {
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+}
+
+/* --- Footer --- */
+footer {
+    margin-top: 50px;
+    padding: 40px;
+    background: #fff;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+}

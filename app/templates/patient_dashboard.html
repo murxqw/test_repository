@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кабінет пацієнта | МедКом</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { backdrop-filter: blur(14px); }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-900">
+  <div class="flex min-h-screen">
+
+    <aside class="hidden xl:flex w-64 flex-col gap-3 border-r border-white/70 bg-white/70 px-5 py-6 glass">
+      <div class="mb-4 flex items-center gap-3">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-400 text-lg font-bold text-white">
+          M
+        </div>
+        <div>
+          <p class="font-semibold">МедКом</p>
+          <p class="text-sm text-slate-500">Patient Panel</p>
+        </div>
+      </div>
+
+      <a href="{{ url_for('patient_dashboard') }}"
+         class="rounded-2xl bg-blue-600 px-4 py-3 text-white font-medium">
+        Кабінет
+      </a>
+
+      <a href="{{ url_for('dashboard') }}"
+         class="rounded-2xl bg-white px-4 py-3 text-slate-700 font-medium shadow-sm hover:bg-slate-50">
+        Лікарі
+      </a>
+
+      <a href="{{ url_for('logout') }}"
+         class="mt-auto rounded-2xl bg-rose-50 px-4 py-3 text-rose-600 font-medium hover:bg-rose-100">
+        Вийти
+      </a>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-6 xl:p-8">
+      <div class="mx-auto max-w-7xl">
+
+        <header class="mb-6 flex flex-col gap-4 rounded-[28px] bg-white/85 p-5 shadow-sm md:flex-row md:items-center md:justify-between glass">
+          <div>
+            <p class="text-sm font-medium text-blue-600">Медична інформаційна система</p>
+            <h1 class="mt-1 text-3xl font-semibold tracking-tight">Мій кабінет</h1>
+            <p class="mt-1 text-sm text-slate-500">
+              Переглядайте записи, рекомендації системи та оновлюйте персональні дані.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="hidden rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-500 md:block">
+              Розумний кабінет пацієнта
+            </div>
+
+            <div class="flex items-center gap-3 rounded-2xl bg-slate-100 px-3 py-2">
+              <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 text-sm font-bold text-white">
+                {{ user.username[0]|upper if user and user.username else 'P' }}
+              </div>
+              <div>
+                <p class="text-sm font-semibold">{{ user.username if user and user.username else 'Пацієнт' }}</p>
+                <p class="text-xs text-slate-500">Patient account</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="mb-6 space-y-3">
+              {% for message in messages %}
+                <div class="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+            <p class="text-sm text-slate-500">Найближчий запис</p>
+            <p class="mt-3 text-3xl font-semibold tracking-tight">{{ next_appointment_date if next_appointment_date else '—' }}</p>
+            <p class="mt-2 text-sm text-slate-400">{{ next_appointment_time if next_appointment_time else 'Поки записів немає' }}</p>
+          </div>
+
+          <div class="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+            <p class="text-sm text-slate-500">Усього записів</p>
+            <p class="mt-3 text-3xl font-semibold tracking-tight">{{ total_appointments if total_appointments is defined else 0 }}</p>
+            <p class="mt-2 text-sm text-slate-400">За весь період</p>
+          </div>
+
+          <div class="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+            <p class="text-sm text-slate-500">Очікувана затримка</p>
+            <p class="mt-3 text-3xl font-semibold tracking-tight">{{ predicted_delay if predicted_delay else '5 хв' }}</p>
+            <p class="mt-2 text-sm text-slate-400">Прогноз системи</p>
+          </div>
+
+          <div class="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-slate-100">
+            <p class="text-sm text-slate-500">Рекомендований слот</p>
+            <p class="mt-3 text-3xl font-semibold tracking-tight">{{ recommended_slot if recommended_slot else '15:20' }}</p>
+            <p class="mt-2 text-sm text-slate-400">Найкращий час для запису</p>
+          </div>
+        </section>
+
+        <section class="mt-6 grid gap-6 xl:grid-cols-[1.45fr_0.95fr]">
+
+          <div class="space-y-6">
+
+            <div class="rounded-[32px] bg-gradient-to-br from-slate-900 via-blue-950 to-blue-700 p-6 text-white shadow-xl shadow-blue-200">
+              <p class="text-sm text-blue-100">AI Recommendation</p>
+              <h2 class="mt-2 text-2xl font-semibold">
+                Рекомендуємо запис на {{ recommended_slot if recommended_slot else '15:20' }}
+              </h2>
+              <p class="mt-3 max-w-xl text-sm text-blue-100/90">
+                На основі історії записів та завантаженості лікарів система прогнозує найзручніший час прийому з мінімальним очікуванням.
+              </p>
+
+              <div class="mt-8 grid gap-4 md:grid-cols-3">
+                <div class="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                  <p class="text-xs text-blue-100">Очікувана затримка</p>
+                  <p class="mt-2 text-xl font-semibold">{{ predicted_delay if predicted_delay else '5 хв' }}</p>
+                </div>
+
+                <div class="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                  <p class="text-xs text-blue-100">Найменше навантаження</p>
+                  <p class="mt-2 text-xl font-semibold">{{ best_day if best_day else 'Четвер' }}</p>
+                </div>
+
+                <div class="rounded-[24px] bg-white/10 p-4 backdrop-blur-sm">
+                  <p class="text-xs text-blue-100">Рекомендований лікар</p>
+                  <p class="mt-2 text-xl font-semibold">{{ recommended_doctor if recommended_doctor else 'Терапевт' }}</p>
+                </div>
+              </div>
+
+              <div class="mt-8 flex flex-wrap gap-3">
+                <a href="{{ url_for('dashboard') }}"
+                   class="rounded-[22px] bg-white px-5 py-3 font-semibold text-slate-900 transition hover:bg-slate-100">
+                  Записатися
+                </a>
+                <button class="rounded-[22px] border border-white/20 px-5 py-3 font-semibold text-white transition hover:bg-white/10">
+                  Деталі прогнозу
+                </button>
+              </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-slate-100">
+              <div class="mb-5 flex items-center justify-between">
+                <div>
+                  <h2 class="text-xl font-semibold">Мої записи</h2>
+                  <p class="text-sm text-slate-500">Найближчі та активні записи на прийом.</p>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                {% if appointments %}
+                  {% for appointment in appointments %}
+                    <div class="flex flex-col gap-4 rounded-[24px] border border-slate-100 p-4 md:flex-row md:items-center md:justify-between">
+                      <div class="flex items-center gap-4">
+                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-center text-sm font-semibold text-blue-600">
+                          {{ appointment.time }}
+                        </div>
+                        <div>
+                          <p class="font-semibold">{{ appointment.doctor_name }}</p>
+                          <p class="text-sm text-slate-500">
+                            {{ appointment.date }} · {{ appointment.specialty }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center gap-3">
+                        <span class="rounded-full bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-600">
+                          Активний
+                        </span>
+
+                        <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}" method="POST">
+                          <button type="submit"
+                                  class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-600 hover:bg-rose-100">
+                            Скасувати
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="rounded-[24px] border border-dashed border-slate-200 p-8 text-center text-slate-500">
+                    У вас поки що немає активних записів.
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="space-y-6">
+
+            <div class="rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-slate-100">
+              <div class="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 class="text-xl font-semibold">Календар записів</h2>
+                  <p class="text-sm text-slate-500">Швидкий перегляд ваших візитів.</p>
+                </div>
+                <div class="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                  {{ current_month }}
+                </div>
+              </div>
+
+              <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {% for day_name in ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'] %}
+                  <div class="py-2">{{ day_name }}</div>
+                {% endfor %}
+              </div>
+
+              <div class="mt-2 grid grid-cols-7 gap-2">
+                {% for day in calendar_days %}
+                  {% if day == '' %}
+                    <div class="aspect-square rounded-2xl"></div>
+                  {% else %}
+                    <a href="{{ url_for('patient_dashboard', day=day) }}"
+                       class="aspect-square rounded-2xl flex items-center justify-center text-sm font-medium
+                       {% if day == selected_day %}
+                         bg-blue-600 text-white shadow-lg shadow-blue-200
+                       {% elif day in busy_days %}
+                         bg-blue-50 text-blue-600 hover:bg-blue-100
+                       {% else %}
+                         bg-slate-50 text-slate-700 hover:bg-slate-100
+                       {% endif %}">
+                      {{ day }}
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              <div class="mt-5 rounded-[24px] bg-slate-50 p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="font-semibold">{{ selected_date }}</p>
+                    <p class="text-sm text-slate-500">{{ selected_date_count }}</p>
+                  </div>
+                  <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
+                    Актуально
+                  </span>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                  {% if selected_date_appointments %}
+                    {% for item in selected_date_appointments %}
+                      <div class="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
+                        {{ item.time }} — {{ item.doctor }}
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="rounded-2xl bg-white px-4 py-3 text-sm text-slate-500 shadow-sm">
+                      На цей день записів немає
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[32px] bg-white p-6 shadow-sm ring-1 ring-slate-100">
+              <div class="mb-5 flex items-center justify-between">
+                <div>
+                  <h2 class="text-xl font-semibold">Профіль пацієнта</h2>
+                  <p class="text-sm text-slate-500">Оновіть свої персональні дані прямо в кабінеті.</p>
+                </div>
+              </div>
+
+              <div class="mb-6 flex items-center gap-4">
+                <div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-500 to-cyan-400 text-xl font-bold text-white">
+                  {{ user.username[0]|upper if user and user.username else 'P' }}
+                </div>
+                <div>
+                  <p class="text-lg font-semibold">{{ user.username if user and user.username else 'Пацієнт' }}</p>
+                  <p class="text-sm text-slate-500">ID профілю: {{ user.id if user and user.id else '—' }}</p>
+                </div>
+              </div>
+
+              <form method="POST" action="{{ url_for('patient_dashboard') }}" class="space-y-4">
+                <div>
+                  <label class="mb-2 block text-sm font-medium text-slate-700">Повне ім’я</label>
+                  <input
+                    type="text"
+                    name="full_name"
+                    value="{{ user.full_name if user and user.full_name else '' }}"
+                    placeholder="Введіть повне ім’я"
+                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                  />
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-sm font-medium text-slate-700">Телефон</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value="{{ user.phone if user and user.phone else '' }}"
+                    placeholder="+380..."
+                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                  />
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-sm font-medium text-slate-700">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value="{{ user.email if user and user.email else '' }}"
+                    placeholder="example@email.com"
+                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:shadow-xl"
+                >
+                  Зберегти дані
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

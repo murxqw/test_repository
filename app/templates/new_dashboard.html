@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% block title %}Наші спеціалісти - МедКом{% endblock %}
+
+{% block content %}
+<style>
+    .search-container {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+    }
+
+    .doctors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .doctor-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .doctor-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .doctor-image {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .doctor-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    }
+
+    .doctor-image i {
+        position: relative;
+        z-index: 1;
+    }
+
+    .doctor-info {
+        padding: 1.5rem;
+    }
+
+    .doctor-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .doctor-specialty {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .doctor-details {
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .no-doctors {
+        text-align: center;
+        color: white;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(20px);
+    }
+
+    @media (max-width: 768px) {
+        .doctors-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .search-container {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+<h1 class="page-title">
+<i class="fas fa-user-md icon"></i>Наші спеціалісти
+</h1>
+<!-- Search Form -->
+<div class="search-container">
+<i class="fas fa-search search-icon"></i>
+<form method="GET" style="width: 100%;">
+<input class="search-input" name="specialty" oninput="delayedSubmit(this.form)" placeholder="Пошук лікаря за спеціальністю..." type="text" value="{{ search_term }}"/>
+</form>
+</div>
+<script>
+let typingTimer;
+function delayedSubmit(form) {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => form.submit(), 400);
+}
+</script>
+<!-- Doctors Grid -->
+{% if doctors %}
+<div class="doctors-grid">
+    {% for doctor in doctors %}
+        <div class="doctor-card">
+<div class="doctor-image">
+                {% if doctor.photo_url %}
+                    <img alt="Фото {{ doctor.name }}" src="{{ url_for('static', filename=doctor.photo_url) }}" style="width: 100%; height: 100%; object-fit: cover;"/>
+                {% else %}
+                    <i class="fas fa-user-md"></i>
+                {% endif %}
+            </div>
+<div class="doctor-info">
+<h3 class="doctor-name">{{ doctor.name }}</h3>
+<p class="doctor-specialty">
+                    {% if 'кардіолог' in doctor.specialty.lower() %}
+                        <i class="fas fa-heartbeat icon"></i>
+                    {% elif 'невролог' in doctor.specialty.lower() %}
+                        <i class="fas fa-brain icon"></i>
+                    {% elif 'ортопед' in doctor.specialty.lower() %}
+                        <i class="fas fa-bone icon"></i>
+                    {% elif 'хірург' in doctor.specialty.lower() %}
+                        <i class="fas fa-cut icon"></i>
+                    {% elif 'педіатр' in doctor.specialty.lower() %}
+                        <i class="fas fa-baby icon"></i>
+                    {% elif 'окуліст' in doctor.specialty.lower() or 'офтальмолог' in doctor.specialty.lower() %}
+                        <i class="fas fa-eye icon"></i>
+                    {% elif 'стоматолог' in doctor.specialty.lower() %}
+                        <i class="fas fa-tooth icon"></i>
+                    {% else %}
+                        <i class="fas fa-stethoscope icon"></i>
+                    {% endif %}
+                    {{ doctor.specialty }}
+                </p>
+<div class="doctor-details">
+                    {% if doctor.experience %}
+                        <p><i class="fas fa-clock icon"></i><strong>Досвід:</strong> {{ doctor.experience }}</p>
+                    {% endif %}
+                    {% if doctor.schedule %}
+                        <p><i class="fas fa-calendar icon"></i><strong>Графік:</strong> {{ doctor.schedule }}</p>
+                    {% endif %}
+                </div>
+<a class="btn btn-primary" href="{{ url_for('make_appointment', doctor_id=doctor.id) }}" style="width: 100%; justify-content: center;">
+<i class="fas fa-calendar-plus icon"></i>Записатися на прийом
+                </a>
+</div>
+</div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-doctors">
+<i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+<h3>Лікарів не знайдено</h3>
+<p>
+        {% if search_term %}
+            За запитом "{{ search_term }}" лікарів не знайдено.<br/>
+            Спробуйте змінити критерії пошуку.
+        {% else %}
+            Наразі в системі немає зареєстрованих лікарів.
+        {% endif %}
+    </p>
+    {% if search_term %}
+        <a class="btn btn-outline" href="{{ url_for('dashboard') }}" style="margin-top: 1rem;">
+<i class="fas fa-list icon"></i>Показати всіх лікарів
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate doctor cards
+    const cards = document.querySelectorAll('.doctor-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

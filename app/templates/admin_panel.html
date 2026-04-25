@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Адмін-панель{% endblock %}
+
+{% block content %}
+<h2>Адмін-панель: Додати лікаря</h2>
+<form class="mb-4" method="POST">
+<input class="form-control mb-2" name="username" placeholder="Логін лікаря" required="" type="text"/>
+<input class="form-control mb-2" name="password" placeholder="Пароль" required="" type="password"/>
+<input class="form-control mb-2" name="name" placeholder="ПІБ лікаря" required="" type="text"/>
+<input class="form-control mb-2" name="specialty" placeholder="Спеціальність" required="" type="text"/>
+<button class="btn btn-success" type="submit">Додати лікаря</button>
+</form>
+<h4>Список лікарів</h4>
+<ul class="list-group">
+    {% for doc in doctors %}
+        <li class="list-group-item">{{ doc.name }} — {{ doc.specialty }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

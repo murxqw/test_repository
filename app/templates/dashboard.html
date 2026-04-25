@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Головна - Лікарі{% endblock %}
+
+{% block content %}
+<h2>Наші спеціалісти</h2>
+<!-- 🔍 Форма пошуку -->
+<form class="mb-3" method="GET">
+<div class="input-group">
+<input class="form-control" name="specialty" oninput="delayedSubmit(this.form)" placeholder="Пошук" type="text" value="{{ search_term }}"/>
+</div>
+</form>
+<script>
+let typingTimer;
+function delayedSubmit(form) {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => form.submit(), 400); // затримка 400 мс
+}
+</script>
+<!-- 🧑‍⚕️ Вивід лікарів -->
+<div class="row">
+    {% for doctor in doctors %}
+        <div class="col-md-4 mb-3">
+<div class="card">
+<img alt="Фото лікаря" class="card-img-top" src="{{ url_for('static', filename=doctor.photo_url) }}"/>
+<div class="card-body">
+<h5 class="card-title">{{ doctor.name }}</h5>
+<p class="card-text">
+                        Спеціальність: {{ doctor.specialty }}<br/>
+                        Досвід: {{ doctor.experience }}<br/>
+                        Графік: {{ doctor.schedule }}
+                    </p>
+<a class="btn btn-primary" href="{{ url_for('make_appointment', doctor_id=doctor.id) }}">Записатися</a>
+</div>
+</div>
+</div>
+    {% endfor %}
+</div>
+{% endblock %}
